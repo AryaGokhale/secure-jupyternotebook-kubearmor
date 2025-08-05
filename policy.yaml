@@ -1,0 +1,46 @@
+apiVersion: security.kubearmor.com/v1
+kind: KubeArmorPolicy
+metadata:
+  name: jupyter-notebook-lenient-allow-policy
+  namespace: jhub
+spec:
+  selector:
+    matchLabels:
+      app: jupyterhub
+      component: singleuser-server
+  file:
+    matchDirectories:
+      - dir: /
+        recursive: true
+      - dir: /usr/local/bin/
+        readOnly: true
+      - dir: /usr/bin/
+        readOnly: true
+      - dir: /bin/
+        readOnly: true
+      - dir: /usr/local/lib/python3.11/site-packages/
+        recursive: true
+        readOnly: true
+  process:
+    matchDirectories:
+      - dir: /usr/local/bin/
+        recursive: true
+      - dir: /usr/bin/
+        recursive: true
+      - dir: /bin/
+        recursive: true
+  network:
+    matchProtocols:
+      - protocol: tcp
+        fromSource:
+          - path: /usr/local/bin/python3.11
+      - protocol: udp
+        fromSource:
+          - path: /usr/local/bin/python3.11
+      - protocol: icmp
+        fromSource:
+          - path: /usr/local/bin/python3.11
+      - protocol: raw
+        fromSource:
+          - path: /usr/local/bin/python3.11
+  action: Allow
